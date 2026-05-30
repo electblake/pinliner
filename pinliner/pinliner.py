@@ -223,7 +223,7 @@ def parse_args():
             sys.stderr.write('\nERROR: %s\n' % message)
             sys.exit(2)
 
-    general_description = """Pinliner - Python Inliner (Version %s)
+    general_description = f"""Pinliner - Python Inliner (Version {__version__})
 
     This tool allows you to merge all files that comprise a Python package into
 a single file and be able to use this single file as if it were a package.
@@ -255,8 +255,31 @@ normal package.  Modules will also behave as usual.
     By default there is no visible separation between the different modules'
 source code, but one can be enabled for clarity with option --tag, which will
 include a newline and a <tag:file_path> tag before each of the source files.
-""" % __version__
+
+
+    --verbose
+
+        Print messages about modules being loaded (.py/.pyc) warning:  lots  of messages, only for debugging
+
+    --embed-code-encoding
+
+        Control the encoding method for payload (embedded code), possible values are
+
+        default_quotes_escape   - should be safe
+        skip                    - no transformation, will possibly break if embedded code contains triple quotes
+
+        base64                  - encoded with base64 (+30% bundle size)
+                                - solves quoten escape issues
+                                - code looks obfuscated (not a problem for LLMs to analyze)
+
+        base85                  - same as base64 but with longer dictionary and is more efficient
+        zlibbase64              - same as base64 but passed through compression to reduce file size
+        zlibbase85              - same as zlibbase64 but more space-efficient
+
+"""
     general_epilog = None
+
+
 
     parser = MyParser(description=general_description,
                       epilog=general_epilog, argument_default='',
@@ -276,13 +299,12 @@ include a newline and a <tag:file_path> tag before each of the source files.
                         action='store_true',
                         help="Mark with <tag:file_path> each added file.")
     parser.add_argument('--verbose', default=False, dest='verbose',
-                        action='store_true',
-                        help="Print messages about modules being loaded and .py module files with code along with .pyc for debugging (warning: lots of messages, only for debugging)")
+                        action='store_true', help="debug module loads (.py and .pyc files)")
+
     parser.add_argument('--embed-code-encoding', dest='payload_encoding',
                         type = str,
                         choices = ['repr','default_quotes_escape','skip','base64','base85','zlibbase64','zlibbase85'],
-                        default='repr',
-                        help=escaped = json.dumps("Control the encoding method for payload (embedded code), possible values are \"default_quotes_escape\" (should be safe escaping but I am not 100% sure), \"skip\" (no transformation, will possibly break if embedded code contains triple quotes), \"base64\" (all encoded with base64, that solves all problems with quotes escaping, the code looks obfuscated but still not a problem for LLMs to analyze, bundle size gets 30% bigger), \"base85\" (same as base64 but with longer dictionary and is more efficient), \"zlibbase64\" (same as base64 but passed through compression to reduce file size), \"zlibbase85\" (same as zlibbase64 but more space-efficient)"))
+                        default='repr')
     parser.add_argument('-d', '--default-pkg', default=None,
                         dest='default_package',
                         help='Define the default package when multiple '
