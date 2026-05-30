@@ -286,7 +286,7 @@ include a newline and a <tag:file_path> tag before each of the source files.
                       formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('packages', nargs='+', help='Packages to inline.')
     parser.add_argument('--version', action='version', version=__version__)
-    parser.add_argument('-o', '--outfile', nargs='?',
+    parser.add_argument('-o', '--outfile', nargs='?', required=True,
                         type=argparse.FileType('w',encoding='utf-8'),
                         default=sys.stdout, help='Output file.')
     parser.add_argument('--set-except', default=None, dest='set_hook',
